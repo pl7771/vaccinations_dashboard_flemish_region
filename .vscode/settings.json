@@ -1,0 +1,11 @@
+{
+  "python.autoComplete.extraPaths": [
+  
+  ],
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--enable=F,E,W",
+    "--disable=no-absolute-import"
+  ],
+  "python.analysis.extraPaths": []
+}

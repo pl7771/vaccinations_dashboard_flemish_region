@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: etl-cron-workflow
+  namespace: argo
+spec:
+  schedule: "0 6,22 * * *"
+  timezone: Europe/Brussels
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 70
+  podGC:
+    strategy: OnPodCompletion
+  workflowSpec:
+    entrypoint: etl-process
+    serviceAccountName: argo
+    templates:
+    - name: etl-process
+      script:
+        image: wimsuenenshogent/covid-etl:1.1
+        imagePullPolicy: Always
+        command: [bash]
+        source: |
+          python /code/main.py -m upgrade
+        env:
+        - name: DATABASE_TYPE
+          value: mssql
+        - name: DATABASE_SERVER
+          value: 34.140.20.123
+        - name: DATABASE_DATABASE
+          value: data_warehouse_covid
+        - name: DATABASE_UID
+          valueFrom:
+            secretKeyRef:
+              name: etl-secrets
+              key: username
+        - name: DATABASE_PWD
+          valueFrom:
+            secretKeyRef:
+              name: etl-secrets
+              key: password
+        - name: SENDGRID_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sendgrid-api-key
+              key: api-key
+        - name: SENDGRID_FROM_EMAIL
+          value: dep.hogent@gmail.com
+        - name: LOGS_TO_EMAILS
+          value: tim.vancampenhout@student.hogent.be;ilya.mikhaylov@student.hogent.be;wim.suenens@student.hogent.be

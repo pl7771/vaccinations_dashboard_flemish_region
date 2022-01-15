@@ -1,0 +1,88 @@
+{
+  "pipelines": [
+    {
+      "source": "https://statbel.fgov.be/sites/default/files/files/opendata/arbeid/TF_PSNL_INC_TAX_MUNTY.zip",
+      "model": "IncomeByNISCodeYearlyUpdated",
+      "metadata_handler": {
+        "frequency": "yearly",
+        "year_column": "year"
+      },
+      "tranforms": [
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "MS_REAL_ESTATE_NET_INC",
+              "MS_NBR_REAL_ESTATE_NET_INC",
+              "MS_TOT_NET_MOV_ASS_INC",
+              "MS_NBR_NET_MOV_ASS_INC",
+              "MS_TOT_NET_VARIOUS_INC",
+              "MS_NBR_NET_VARIOUS_INC",
+              "MS_SEP_TAXABLE_INC",
+              "MS_NBR_SEP_TAXABLE_INC",
+              "MS_JOINT_TAXABLE_INC",
+              "MS_NBR_JOINT_TAXABLE_INC",
+              "MS_TOT_DEDUCT_SPEND",
+              "MS_NBR_DEDUCT_SPEND",
+              "MS_TOT_STATE_TAXES",
+              "MS_NBR_STATE_TAXES",
+              "MS_TOT_MUNICIP_TAXES",
+              "MS_NBR_MUNICIP_TAXES",
+              "MS_TOT_SUBURBS_TAXES",
+              "MS_NBR_SUBURBS_TAXES",
+              "TX_MUNTY_DESCR_FR",
+              "TX_MUNTY_DESCR_EN",
+              "TX_MUNTY_DESCR_DE",
+              "TX_DSTR_DESCR_FR",
+              "TX_DSTR_DESCR_EN",
+              "TX_DSTR_DESCR_DE",
+              "TX_PROV_DESCR_FR",
+              "TX_PROV_DESCR_EN",
+              "TX_PROV_DESCR_DE",
+              "TX_RGN_DESCR_FR",
+              "TX_RGN_DESCR_EN",
+              "TX_RGN_DESCR_DE",
+              "TX_MUNTY_DESCR_NL",
+              "CD_DSTR_REFNIS",
+              "TX_DSTR_DESCR_NL",
+              "CD_PROV_REFNIS",
+              "TX_PROV_DESCR_NL",
+              "CD_RGN_REFNIS",
+              "TX_RGN_DESCR_NL"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "CD_YEAR": "year",
+              "CD_MUNTY_REFNIS": "municipality_niscode",
+              "MS_NBR_NON_ZERO_INC": "nr_of_declarations",
+              "MS_NBR_ZERO_INC": "nr_zero_incomes",
+              "MS_TOT_NET_TAXABLE_INC": "total_taxable_income",
+              "MS_TOT_NET_INC": "total_net_income",
+              "MS_NBR_TOT_NET_INC": "nr_total_income",
+              "MS_TOT_NET_PROF_INC": "total_net_professional_income",
+              "MS_NBR_NET_PROF_INC": "nr_net_professional_income",
+              "MS_TOT_TAXES": "total_taxes",
+              "MS_NBR_TOT_TAXES": "nr_taxes",
+              "MS_TOT_RESIDENTS": "nr_population"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "municipality_niscode",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,695 @@
+{
+  "pipelines": [
+    {
+      "source": "https://statbel.fgov.be/sites/default/files/files/opendata/REFNIS%20code/TU_COM_REFNIS.zip",
+      "model": "NIS_Code",
+      "metadata_handler": {
+        "frequency": "yearly",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "LVL_REFNIS": "level",
+              "CD_REFNIS": "nis",
+              "CD_SUP_REFNIS": "parent_nis",
+              "TX_REFNIS_NL": "text_nl",
+              "TX_REFNIS_FR": "text_fr",
+              "TX_REFNIS_DE": "text_de",
+              "DT_VLDT_START": "valid_from",
+              "DT_VLDT_END": "valid_till"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "parent_nis",
+            "current_value": "-",
+            "value_if_true": {
+              "type": "string",
+              "value": ""
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "parent_nis",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "valid_from",
+            "current_value": "01/01/1970",
+            "value_if_true": {
+              "type": "date",
+              "value": "date.min"
+            },
+            "value_if_false": {
+              "type": "date",
+              "format": "%d/%m/%Y"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "valid_till",
+            "current_value": "31/12/9999",
+            "value_if_true": {
+              "type": "date",
+              "value": "date.max"
+            },
+            "value_if_false": {
+              "type": "date",
+              "format": "%d/%m/%Y"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://epistat.sciensano.be/Data/COVID19BE_VACC.csv",
+      "model": "CovidVaccinationByCategory",
+      "metadata_handler": {
+        "frequency": "daily",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "DATE": "date",
+              "REGION": "region",
+              "AGEGROUP": "agegroup",
+              "SEX": "sex",
+              "BRAND": "brand",
+              "DOSE": "dose",
+              "COUNT": "count"
+            }
+          }
+        },
+        {
+          "type": "drop_na"
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "date",
+            "update": {
+              "type": "date",
+              "format": "%Y-%m-%d"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://epistat.sciensano.be/Data/COVID19BE_MORT.csv",
+      "model": "CovidMortalityByCategory",
+      "metadata_handler": {
+        "frequency": "daily",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "DATE": "date",
+              "REGION": "region",
+              "AGEGROUP": "agegroup",
+              "SEX": "sex",
+              "DEATHS": "deaths"
+            }
+          }
+        },
+        {
+          "type": "drop_na"
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "date",
+            "update": {
+              "type": "date",
+              "format": "%Y-%m-%d"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv",
+      "model": "CovidConfirmedCasesByCategory",
+      "metadata_handler": {
+        "frequency": "daily",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "DATE": "date",
+              "PROVINCE": "province",
+              "REGION": "region",
+              "AGEGROUP": "agegroup",
+              "SEX": "sex",
+              "CASES": "cases"
+            }
+          }
+        },
+        {
+          "type": "drop_na"
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "date",
+            "update": {
+              "type": "date",
+              "format": "%Y-%m-%d"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://statbel.fgov.be/sites/default/files/files/opendata/bevolking%20naar%20woonplaats%2C%20nationaliteit%20burgelijke%20staat%20%2C%20leeftijd%20en%20geslacht/TF_SOC_POP_STRUCT_2021.zip",
+      "model": "DemographicsByNISCodeAndCategory",
+      "metadata_handler": {
+        "frequency": "yearly",
+        "year_column": "year"
+      },
+      "tranforms": [
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "TX_DESCR_NL",
+              "TX_DESCR_FR",
+              "CD_DSTR_REFNIS",
+              "TX_ADM_DSTR_DESCR_NL",
+              "TX_ADM_DSTR_DESCR_FR",
+              "CD_PROV_REFNIS",
+              "TX_PROV_DESCR_NL",
+              "TX_PROV_DESCR_FR",
+              "CD_RGN_REFNIS",
+              "TX_RGN_DESCR_NL",
+              "TX_RGN_DESCR_FR"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "CD_REFNIS": "nis",
+              "CD_SEX": "sex",
+              "CD_NATLTY": "nationality_code",
+              "TX_NATLTY_NL": "nationality_text_nl",
+              "TX_NATLTY_FR": "nationality_text_fr",
+              "CD_CIV_STS": "marital_status_code",
+              "TX_CIV_STS_NL": "marital_status_text_nl",
+              "TX_CIV_STS_FR": "marital_status_text_fr",
+              "CD_AGE": "age",
+              "MS_POPULATION": "population"
+            }
+          }
+        },
+        {
+          "type": "add_column",
+          "data": {
+            "column": "year",
+            "static_value": {
+              "type": "integer",
+              "value": 2021
+            }
+          }
+        },
+        {
+          "type": "group_by",
+          "data": {
+            "columns": [
+              "year",
+              "nis",
+              "sex",
+              "nationality_code",
+              "nationality_text_nl",
+              "nationality_text_fr",
+              "marital_status_code",
+              "marital_status_text_nl",
+              "marital_status_text_fr",
+              "age"
+            ],
+            "aggregate": {
+              "type": "sum"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis",
+            "update": {
+              "type": "string",
+              "find": "(\\.0+)",
+              "replace": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://statbel.fgov.be/sites/default/files/files/opendata/deathday/DEMO_DEATH_OPEN.zip",
+      "model": "NumberOfDeathsByDistrictNISCode",
+      "metadata_handler": {
+        "frequency": "daily",
+        "date_column": "date"
+      },
+      "tranforms": [
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "CD_PROV",
+              "CD_REGIO",
+              "NR_YEAR",
+              "NR_WEEK"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "CD_ARR": "nis_district",
+              "CD_SEX": "sex",
+              "CD_AGEGROUP": "agegroup",
+              "DT_DATE": "date",
+              "MS_NUM_DEATH": "number_of_deaths"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "date",
+            "update": {
+              "type": "date",
+              "format": "%d-%m-%Y"
+            }
+          }
+        },
+        {
+          "type": "group_by",
+          "data": {
+            "columns": [
+              "date",
+              "nis_district",
+              "sex",
+              "agegroup"
+            ],
+            "aggregate": {
+              "type": "sum"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_district",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_district",
+            "update": {
+              "type": "string",
+              "find": "(\\.0+)",
+              "replace": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://www.laatjevaccineren.be/vaccination-info/get/vaccinaties.csv",
+      "model": "VaccinationsByNISCodeDailyUpdated",
+      "metadata_handler": {
+        "frequency": "daily",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "MUNICIPALITY",
+              "PROVINCE",
+              "REGION",
+              "EERSTELIJNSZONE"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "NIS_CD": "nis_code",
+              "GENDER_CD": "sex",
+              "AGE_CD": "agegroup",
+              "ADULT_FL(18+)": "plus18",
+              "SENIOR_FL(65+)": "plus65",
+              "FULLY_VACCINATED_AMT": "vaccinated_fully_total",
+              "PARTLY_VACCINATED_AMT": "vaccinated_partly_total",
+              "FULLY_VACCINATED_AZ_AMT": "vaccinated_fully_astrazeneca",
+              "PARTLY_VACCINATED_AZ_AMT": "vaccinated_partly_astrazeneca",
+              "FULLY_VACCINATED_PF_AMT": "vaccinated_fully_pfizer",
+              "PARTLY_VACCINATED_PF_AMT": "vaccinated_partly_pfizer",
+              "FULLY_VACCINATED_MO_AMT": "vaccinated_fully_moderna",
+              "PARTLY_VACCINATED_MO_AMT": "vaccinated_partly_moderna",
+              "FULLY_VACCINATED_JJ_AMT": "vaccinated_fully_johnsonandjohnson",
+              "FULLY_VACCINATED_OTHER_AMT": "vaccinated_fully_other",
+              "PARTLY_VACCINATED_OTHER_AMT": "vaccinated_partly_other",
+              "BOOSTER_AMT": "vaccinated_with_booster",
+              "POPULATION_NBR": "population_by_agecategory_and_municipality"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "plus18",
+            "current_value": 1,
+            "value_if_true": {
+              "type": "boolean",
+              "value": true
+            },
+            "value_if_false": {
+              "type": "boolean",
+              "value": false
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "plus65",
+            "current_value": 1,
+            "value_if_true": {
+              "type": "boolean",
+              "value": true
+            },
+            "value_if_false": {
+              "type": "boolean",
+              "value": false
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_code",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_code",
+            "update": {
+              "type": "string",
+              "find": "(\\.0+)",
+              "replace": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://epistat.sciensano.be/data/COVID19BE_VACC_MUNI_CUM.csv",
+      "model": "VaccinationsByNISCodeAndWeek",
+      "metadata_handler": {
+        "frequency": "daily",
+        "full_refresh": true
+      },
+      "tranforms": [
+        {
+          "type": "drop_na"
+        },
+        {
+          "type": "add_column",
+          "data": {
+            "column": "date",
+            "column_from": "YEAR_WEEK",
+            "update": {
+              "type": "date",
+              "suffix": "1",
+              "format": "%yW%W%w"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "date",
+            "update": {
+              "type": "date",
+              "subtract": {
+                "days": 7
+              }
+            }
+          }
+        },
+        {
+          "type": "add_column",
+          "data": {
+            "column": "week",
+            "column_from": "date",
+            "update": {
+              "type": "integer",
+              "get": "weeknum"
+            }
+          }
+        },
+        {
+          "type": "add_column",
+          "data": {
+            "column": "year",
+            "column_from": "date",
+            "update": {
+              "type": "integer",
+              "get": "year"
+            }
+          }
+        },
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "YEAR_WEEK"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "NIS5": "nis_code",
+              "AGEGROUP": "agegroup",
+              "DOSE": "dose",
+              "CUMUL": "cumul_of_week"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_code",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "nis_code",
+            "update": {
+              "type": "string",
+              "find": "(\\.0+)",
+              "replace": ""
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "cumul_of_week",
+            "type": "integer",
+            "current_value": "<10",
+            "value_if_true": {
+              "type": "integer",
+              "value": 10
+            }
+          }
+        },
+        {
+          "type": "group_by",
+          "data": {
+            "columns": [
+              "nis_code",
+              "agegroup",
+              "dose",
+              "date",
+              "week",
+              "year"
+            ],
+            "aggregate": {
+              "type": "sum"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "source": "https://statbel.fgov.be/sites/default/files/files/opendata/arbeid/TF_PSNL_INC_TAX_MUNTY.zip",
+      "model": "IncomeByNISCodeYearlyUpdated",
+      "metadata_handler": {
+        "frequency": "yearly",
+        "year_column": "year"
+      },
+      "tranforms": [
+        {
+          "type": "drop_columns",
+          "data": {
+            "columns": [
+              "MS_REAL_ESTATE_NET_INC",
+              "MS_NBR_REAL_ESTATE_NET_INC",
+              "MS_TOT_NET_MOV_ASS_INC",
+              "MS_NBR_NET_MOV_ASS_INC",
+              "MS_TOT_NET_VARIOUS_INC",
+              "MS_NBR_NET_VARIOUS_INC",
+              "MS_SEP_TAXABLE_INC",
+              "MS_NBR_SEP_TAXABLE_INC",
+              "MS_JOINT_TAXABLE_INC",
+              "MS_NBR_JOINT_TAXABLE_INC",
+              "MS_TOT_DEDUCT_SPEND",
+              "MS_NBR_DEDUCT_SPEND",
+              "MS_TOT_STATE_TAXES",
+              "MS_NBR_STATE_TAXES",
+              "MS_TOT_MUNICIP_TAXES",
+              "MS_NBR_MUNICIP_TAXES",
+              "MS_TOT_SUBURBS_TAXES",
+              "MS_NBR_SUBURBS_TAXES",
+              "TX_MUNTY_DESCR_FR",
+              "TX_MUNTY_DESCR_EN",
+              "TX_MUNTY_DESCR_DE",
+              "TX_DSTR_DESCR_FR",
+              "TX_DSTR_DESCR_EN",
+              "TX_DSTR_DESCR_DE",
+              "TX_PROV_DESCR_FR",
+              "TX_PROV_DESCR_EN",
+              "TX_PROV_DESCR_DE",
+              "TX_RGN_DESCR_FR",
+              "TX_RGN_DESCR_EN",
+              "TX_RGN_DESCR_DE",
+              "TX_MUNTY_DESCR_NL",
+              "CD_DSTR_REFNIS",
+              "TX_DSTR_DESCR_NL",
+              "CD_PROV_REFNIS",
+              "TX_PROV_DESCR_NL",
+              "CD_RGN_REFNIS",
+              "TX_RGN_DESCR_NL"
+            ]
+          }
+        },
+        {
+          "type": "rename_columns",
+          "data": {
+            "columns": {
+              "CD_YEAR": "year",
+              "CD_MUNTY_REFNIS": "municipality_niscode",
+              "MS_NBR_NON_ZERO_INC": "nr_of_declarations",
+              "MS_NBR_ZERO_INC": "nr_zero_incomes",
+              "MS_TOT_NET_TAXABLE_INC": "total_taxable_income",
+              "MS_TOT_NET_INC": "total_net_income",
+              "MS_NBR_TOT_NET_INC": "nr_total_income",
+              "MS_TOT_NET_PROF_INC": "total_net_professional_income",
+              "MS_NBR_NET_PROF_INC": "nr_net_professional_income",
+              "MS_TOT_TAXES": "total_taxes",
+              "MS_NBR_TOT_TAXES": "nr_taxes",
+              "MS_TOT_RESIDENTS": "nr_population"
+            }
+          }
+        },
+        {
+          "type": "update_value",
+          "data": {
+            "column": "municipality_niscode",
+            "type": "string",
+            "update": {
+              "type": "string",
+              "format": "{0:0>5}"
+            }
+          }
+        },
+        {
+          "type": "replace",
+          "data": {
+            "to_replace": "*",
+            "value": 0,
+            "inplace": true
+          }
+        },
+        {
+          "type": "drop_na"
+        }
+      ]
+    }
+  ]
+}

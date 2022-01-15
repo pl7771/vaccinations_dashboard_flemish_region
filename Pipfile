@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pandas = "*"
+openpyxl = "*"
+pyyaml = "*"
+sqlalchemy = "*"
+pyodbc = "*"
+alembic = "*"
+pre-commit = "*"
+pytz = "*"
+sendgrid = "*"
+tqdm = "*"
+
+[dev-packages]
+jupyter = "*"
+pylint = "*"
+black = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
